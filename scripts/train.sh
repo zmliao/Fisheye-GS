@@ -1,0 +1,14 @@
+python train.py \
+    -m output/0a5c013435 \
+    -s /nas/shared/pjlab_lingjun_landmarks/liaozimu/data/scannet/0a5c013435/dslr \
+    --images image_undistorted_fisheye \
+    --colmaps colmap \
+    --iterations 30000 \
+    --save_iterations 10000 20000 30000\
+    --test_iterations 10000 20000 30000 \
+    --bs 3 \
+    --ds 1 \
+    -r 1 \
+    --sh_degree 3 \
+    --fisheye \
+    --train_random_background 

@@ -1,0 +1,18 @@
+*.pyc
+.vscode
+output
+output/
+SIBR_viewers
+SIBR_viewers/
+logs
+logs/
+build
+tensorboard_3d
+# screenshots
+# align.py
+# build_dataset.py
+# build_pc.sh
+core.*
+*.log
+
+./submodules/panorama_*
