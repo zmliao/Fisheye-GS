@@ -8,6 +8,7 @@ which are crucial for its broader real-life applications. To tackle these challe
 1. Release paper.
 2. Release kernel for panorama lens.
 3. Release Fisheye-GS for Flash-GS(https://github.com/InternLandMark/FlashGS).
+4. Release the dataset we use.
 ### Hardware Requirements
 
 - CUDA-ready GPU with Compute Capability 7.0+
