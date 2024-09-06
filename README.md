@@ -1,5 +1,5 @@
-# Fisheye-GS: Fisheye-GS: Efficient Gaussian Splatting for Fisheye Cameras
-| Zimu Liao, Siyan Chen, Rong Fu, Yi Wang, Zhongling Su, Hao Luo, Linning Xu, Bo Dai, Hengjie Li, Zhilin Pei, Xingcheng Zhang<br> 
+# Fisheye-GS
+
 
 ![Teaser image](assets/teaser1.jpg)
 
