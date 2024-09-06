@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
+from pyquaternion import Quaternion
 import imageio
 from colorama import Back, Fore, Style
 from PIL import Image
@@ -194,9 +195,9 @@ def readColmapSceneInfo(args):
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
-    ply_path = os.path.join(path, "colmap/points3D.ply")
-    bin_path = os.path.join(path, "colmap/points3D.bin")
-    txt_path = os.path.join(path, "colmap/points3D.txt")
+    ply_path = os.path.join(path, f"{colmap_dir}/points3D.ply")
+    bin_path = os.path.join(path, f"{colmap_dir}/points3D.bin")
+    txt_path = os.path.join(path, f"{colmap_dir}/points3D.txt")
     if not os.path.exists(ply_path):
         print("Converting point3d.bin to .ply, will happen only the first time you open the scene.")
         try:
@@ -363,7 +364,94 @@ def readNerfSyntheticInfo(args):
                            ply_path=ply_path)
     return scene_info
 
+
+def readCameraFromMvl(path, white_background):
+    cam_infos = []
+    img_dir = os.path.join(path, "img")
+    cam_dir = os.path.join(path, "geometry_info")
+
+    img_fnames = [os.path.join(img_dir, x) for x in os.listdir(img_dir)]
+    cam_fnames = [os.path.join(cam_dir, x) for x in os.listdir(cam_dir)]
+
+    for idx, (img_fname, cam_fname) in enumerate(zip(img_fnames, cam_fnames)):
+        #read cameras
+        with open(cam_fname) as json_file:
+            contents = json.load(json_file)
+        translation = contents['translation']
+        qx, qy, qz, qw = contents['quaternion']
+
+        R = np.array(Quaternion(qx=qx, qy=qy, qz=qz, qw=qw).rotation_matrix)
+        T = np.array(translation)
+
+        c2w = np.array([
+            [R[0, 0], R[0, 1], R[0, 2], T[0]],
+            [R[1, 0], R[1, 1], R[1, 2], T[1]],
+            [R[2, 0], R[2, 1], R[2, 2], T[2]],
+            [0, 0, 0, 1]
+        ])
+
+        # c2w[:3, 1:2] *= -1
+        w2c = np.linalg.inv(c2w)
+        R = np.transpose(w2c[:3,:3])  # R is stored transposed due to 'glm' in CUDA code
+        T = w2c[:3, 3]
+
+        #read images
+        image = Image.open(img_fname)
+        im_data = np.array(image.convert("RGBA"))
+        bg = np.array([1,1,1]) if white_background else np.array([0, 0, 0])
+        norm_data = im_data / 255.0
+        arr = norm_data[:,:,:3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
+        image = Image.fromarray(np.array(arr*255.0, dtype=np.byte), "RGB")
+        img_name = img_fname.split('/')[-1].split('.')[0]
+
+        cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=image.size[0], FovX=image.size[1], image=image,
+            image_path=img_fname, image_name=img_name, width=image.size[0], height=image.size[1]))
+
+    return cam_infos
+
+def readMvlInfo(args):
+    path = args.source_path
+    eval = args.eval
+    scene = path.split('/')[-1]
+
+    cam_infos = readCameraFromMvl(path, args.white_background)
+    eval = True
+    llffhold = 6
+
+    if eval:
+        train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+        test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+    else:
+        train_cam_infos = cam_infos
+        test_cam_infos = []
+    nerf_normalization = getNerfppNorm(train_cam_infos)
+
+    ply_path = os.path.join(path, "points3d.ply")
+    if not os.path.exists(ply_path):
+        # Since this data set has no colmap data, we start with random points
+        num_pts = 500_000
+        print(f"Generating random point cloud ({num_pts})...")
+        
+        # We create random points inside the bounds of the synthetic Blender scenes
+        xyz = np.random.random((num_pts, 3)) * 2.6 - 1.3
+        shs = np.random.random((num_pts, 3)) / 255.0
+        pcd = BasicPointCloud(points=xyz, colors=SH2RGB(shs), normals=np.zeros((num_pts, 3)))
+
+        storePly(ply_path, xyz, SH2RGB(shs) * 255)
+    try:
+        pcd = fetchPly(ply_path)
+    except:
+        pcd = None
+    
+    scene_info = SceneInfo(point_cloud=pcd,
+                           train_cameras=train_cam_infos,
+                           test_cameras=test_cam_infos,
+                           nerf_normalization=nerf_normalization,
+                           ply_path=ply_path)
+    return scene_info
+
 sceneLoadTypeCallbacks = {
     "Colmap": readColmapSceneInfo,
-    "Blender" : readNerfSyntheticInfo
+    "Blender" : readNerfSyntheticInfo,
+    "MVL" : readMvlInfo 
 }

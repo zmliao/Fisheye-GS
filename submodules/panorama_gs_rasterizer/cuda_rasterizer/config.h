@@ -18,6 +18,6 @@
 
 #define EPS 1e-8 // epsilon, avoid dividing zero
 
-#define SEAM 1//seaming for panorama cameras
+#define SEAM 0//seaming for panorama cameras
 
 #endif

@@ -16,3 +16,4 @@ core.*
 *.log
 
 ./submodules/panorama_*
+./submodules/fisheye_gs_rasterizer_old

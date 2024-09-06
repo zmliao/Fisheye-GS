@@ -48,6 +48,9 @@ class Scene:
         elif os.path.exists(os.path.join(args.source_path, "transforms.json")) or os.path.exists(os.path.join(args.source_path, "transforms_train.json")):
             print(Fore.YELLOW+"Found transforms.json file, assuming Blender data set!"+Style.RESET_ALL)
             scene_info = sceneLoadTypeCallbacks["Blender"](args)
+        elif os.path.exists(os.path.join(args.source_path, "img")):
+            print(Fore.YELLOW+"Assuming MVL data set!"+Style.RESET_ALL)
+            scene_info = sceneLoadTypeCallbacks["MVL"](args)
         else:
             assert False, "Could not recognize scene type!"
 

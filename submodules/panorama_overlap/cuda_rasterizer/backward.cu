@@ -165,15 +165,17 @@ __global__ void computeCov2DFisheyeCUDA(int P,
 	float3 dL_dconic = { dL_dconics[4 * idx], dL_dconics[4 * idx + 1], dL_dconics[4 * idx + 3] };
 	float3 t = transformPoint4x3(mean, view_matrix);
 	
-	const float limx = 9982444353.f;
-	const float limy = 9982444353.f;
-	const float txtz = t.x / t.z;
-	const float tytz = t.y / t.z;
-	t.x = min(limx, max(-limx, txtz)) * t.z;
-	t.y = min(limy, max(-limy, tytz)) * t.z;
+	// const float limx = 9982444353.f;
+	// const float limy = 9982444353.f;
+	// const float txtz = t.x / t.z;
+	// const float tytz = t.y / t.z;
+	// t.x = min(limx, max(-limx, txtz)) * t.z;
+	// t.y = min(limy, max(-limy, tytz)) * t.z;
 
-	const float x_grad_mul = txtz < -limx || txtz > limx ? 0 : 1;
-	const float y_grad_mul = tytz < -limy || tytz > limy ? 0 : 1;
+	// const float x_grad_mul = txtz < -limx || txtz > limx ? 0 : 1;
+	// const float y_grad_mul = tytz < -limy || tytz > limy ? 0 : 1;
+	const float x_grad_mul = 1;
+	const float y_grad_mul = 1;
 	
 	const float inv_pi = 1.0f / 3.1415926536f;
 	const float inv_2pi = 0.5f * inv_pi;
@@ -355,15 +357,17 @@ __global__ void computeCov2DCUDA(int P,
 	float3 dL_dconic = { dL_dconics[4 * idx], dL_dconics[4 * idx + 1], dL_dconics[4 * idx + 3] };
 	float3 t = transformPoint4x3(mean, view_matrix);
 	
-	const float limx = 1.3f * tan_fovx;
-	const float limy = 1.3f * tan_fovy;
-	const float txtz = t.x / t.z;
-	const float tytz = t.y / t.z;
-	t.x = min(limx, max(-limx, txtz)) * t.z;
-	t.y = min(limy, max(-limy, tytz)) * t.z;
+	// const float limx = 1.3f * tan_fovx;
+	// const float limy = 1.3f * tan_fovy;
+	// const float txtz = t.x / t.z;
+	// const float tytz = t.y / t.z;
+	// t.x = min(limx, max(-limx, txtz)) * t.z;
+	// t.y = min(limy, max(-limy, tytz)) * t.z;
 	
-	const float x_grad_mul = txtz < -limx || txtz > limx ? 0 : 1;
-	const float y_grad_mul = tytz < -limy || tytz > limy ? 0 : 1;
+	// const float x_grad_mul = txtz < -limx || txtz > limx ? 0 : 1;
+	// const float y_grad_mul = tytz < -limy || tytz > limy ? 0 : 1;
+	const float x_grad_mul = 1;
+	const float y_grad_mul = 1;
 
 	glm::mat3 J = glm::mat3(h_x / t.z, 0.0f, -(h_x * t.x) / (t.z * t.z),
 		0.0f, h_y / t.z, -(h_y * t.y) / (t.z * t.z),

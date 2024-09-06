@@ -40,31 +40,29 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
 
     render_times = []
     image_save_times = []
-    progress_bar = tqdm(views, desc="Rendering progress")
+    # progress_bar = tqdm(views, desc="Rendering progress")
     for _ in range(5):
         results = render(views[0], gaussians, pipeline, background, is_fisheye=True)
-    for idx, view in enumerate(views):
+    for idx, view in tqdm(enumerate(views)):
         
         render_start = time.time()
-
         results = render(view, gaussians, pipeline, background, is_fisheye=True)
-
         torch.cuda.synchronize()
         render_end = time.time()
         rendering = results["render"]
         render_times.append((render_end - render_start)*1000)
-        image_save_start = time.time()
-        gt = view.original_image[0:3, :, :]
-        torchvision.utils.save_image(rendering, os.path.join(render_path, '{0:05d}'.format(idx) + ".png"))
-        torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
-        image_save_end = time.time()
-        image_save_times.append((image_save_end - image_save_start)*1000)
+        # image_save_start = time.time()
+        # gt = view.original_image[0:3, :, :]
+        # torchvision.utils.save_image(rendering, os.path.join(render_path, '{0:05d}'.format(idx) + ".png"))
+        # torchvision.utils.save_image(gt, os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
+        # image_save_end = time.time()
+        # image_save_times.append((image_save_end - image_save_start)*1000)
 
         try:
             # in case on two devices
             ps = psnr(rendering, gt).mean()
-            progress_bar.set_postfix({"psnr": Fore.YELLOW+f"{ps:.4f}"+Style.RESET_ALL})
-            progress_bar.update(1)
+            # progress_bar.set_postfix({"psnr": Fore.YELLOW+f"{ps:.4f}"+Style.RESET_ALL})
+            # progress_bar.update(1)
         except:
             pass
     
@@ -76,7 +74,7 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
     print(f"  FPS: {FPS}")   
     max_allocated_memory_after = torch.cuda.max_memory_allocated()
     print(f"Max Allocated Memory After Rendering: {max_allocated_memory_after} bytes")
-    progress_bar.close()
+    # progress_bar.close()
 
 def render_sets(dataset : ModelParams, iteration : int, pipeline : PipelineParams, skip_train : bool, skip_test : bool):
     with torch.no_grad():

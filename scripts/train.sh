@@ -1,6 +1,6 @@
 python train.py \
     -m output/0a5c013435 \
-    -s /nas/shared/pjlab_lingjun_landmarks/liaozimu/data/scannet/0a5c013435/dslr \
+    -s /nas/shared/pjlab-lingjun-landmarks/liaozimu/data/scannet/0a5c013435/dslr \
     --images image_undistorted_fisheye \
     --colmaps colmap \
     --iterations 30000 \
