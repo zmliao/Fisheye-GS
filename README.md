@@ -5,6 +5,11 @@
 
 **Abstract**: Recently, 3D Gaussian Splatting (3DGS) has gained attention for its high fidelity and real-time rendering. However, adapting 3DGS to different camera models, particularly fisheye lenses, poses challenges due to the unique 3D to 2D projection calculation. Additionally, there are inefficiencies in the tile-based splatting, especially for the extreme curvature and wide field of view of fisheye lenses, which are crucial for its broader real-life applications. To address these challenges, we introduce Fisheye-GS, a novel method that recalculates the projection transformation for fisheye cameras, and then optimizes the rendering process with the reduced number of overlapped tiles. Our method reduces computational redundancy and memory usage, significantly improving rendering speed and enabling 3DGS to be effectively used with a wider range of camera perspectives. With our optimization, we achieved a maximum rendering efficiency of 570 FPS at a high-definition resolution of 1752 × 1168.
 
+## TODO
++ Release Paper
++ Release Fisheye-GS for FlashGS
++ Release the dataset we use
++ Release panorama
 ### Hardware Requirements
 
 - CUDA-ready GPU with Compute Capability 7.0+
