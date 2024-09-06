@@ -3,13 +3,7 @@
 
 ![Teaser image](assets/teaser1.jpg)
 
-**Abstract**: Fisheye-GS: Lightweight and Extensible Gaussian
-Splatting Module for Fisheye Cameras
-Zimu Liao1, Siyan Chen1, Rong Fu1, Yi Wang1, Zhongling Su1, Hao Luo1,
-Linning Xu2, Bo Dai1, Hengjie Li1, Zhiling Pei1, and Xingcheng Zhang1
-1 Shanghai Artificial Intelligence Laboratory
-2 The Chinese University of Hong Kong
-Abstract. Recently, 3D Gaussian Splatting (3DGS) has garnered at-
+**Abstract**: Recently, 3D Gaussian Splatting (3DGS) has garnered at-
 tention for its high fidelity and real-time rendering. However, adapting
 3DGS to different camera models, particularly fisheye lenses, poses chal-
 lenges due to the unique 3D to 2D projection calculation. Additionally,
