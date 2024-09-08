@@ -19,8 +19,8 @@ ECCV 2024 Workshop NFBCC
 
 ### Software Requirements
 - Conda (recommended for easy setup)
-- C++ Compiler for PyTorch extensions (we used Visual Studio 2019 for Windows)
-- CUDA SDK 11 for PyTorch extensions, install *after* Visual Studio
+- C++ Compiler for PyTorch extensions 
+- CUDA SDK 11 for PyTorch extensions
 - C++ Compiler and CUDA SDK must be compatible
 
 ## Setup
