@@ -1,26 +1,12 @@
 # Fisheye-GS
-
+ECCV 2024 Workshop NFBCC
+[paper](https://neural-fields-beyond-cams.github.io/accepted_papers/20.pdf)
 
 ![Teaser image](assets/teaser1.jpg)
 
-**Abstract**: Recently, 3D Gaussian Splatting (3DGS) has garnered at-
-tention for its high fidelity and real-time rendering. However, adapting
-3DGS to different camera models, particularly fisheye lenses, poses chal-
-lenges due to the unique 3D to 2D projection calculation. Additionally,
-there are inefficiencies in the tile-based splatting, especially for the ex-
-treme curvature and wide field of view of fisheye lenses, which are crucial
-for its broader real-life applications. To tackle these challenges, we intro-
-duce Fisheye-GS⋆. This innovative method recalculates the projection
-transformation and its gradients for fisheye cameras. Our approach can
-be seamlessly integrated as a module into other efficient 3D rendering
-methods, emphasizing its extensibility, lightweight nature, and modular
-design. Since we only modified the projection component, it can also
-be easily adapted for use with different camera models. Compared to
-methods that train after undistortion, our approach demonstrates a clear
-improvement in visual quality.
+**Abstract**:  Recently, 3D Gaussian Splatting (3DGS) has garnered attention for its high fidelity and real-time rendering. However, adapting 3DGS to different camera models, particularly fisheye lenses, poses challenges due to the unique 3D to 2D projection calculation. Additionally, there are inefficiencies in the tile-based splatting, especially for the extreme curvature and wide field of view of fisheye lenses, which are crucial for its broader real-life applications. To tackle these challenges, we introduce Fisheye-GS. This innovative method recalculates the projection transformation and its gradients for fisheye cameras. Our approach can be seamlessly integrated as a module into other efficient 3D rendering methods, emphasizing its extensibility, lightweight nature, and modular design. Since we only modified the projection component, it can also be easily adapted for use with different camera models. Compared to methods that train after undistortion, our approach demonstrates a clear improvement in visual quality.
 
 ## TODO
-+ Release Paper
 + Release Fisheye-GS for FlashGS
 + Release the dataset we use
 + Release panorama
