@@ -1,5 +1,6 @@
 # Fisheye-GS
 ECCV 2024 Workshop NFBCC
+
 [paper](https://neural-fields-beyond-cams.github.io/accepted_papers/20.pdf)
 
 ![Teaser image](assets/teaser1.jpg)
