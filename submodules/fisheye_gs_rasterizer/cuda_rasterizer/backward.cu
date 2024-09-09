@@ -317,11 +317,6 @@ __global__ void computeCov2DFisheyeCUDA(int P,
 	float dJ_dz11 = dJ_dy12;
 	float dJ_dz12 = 2.f * h_y * t.y * t.z * inv1;
 
-	// printf("J = \n[%.10f, %.10f, %.10f\n, %.10f, %.10f, %.10f]\n", J[0][0], J[0][1], J[0][2], J[1][0], J[1][1], J[1][2]);
-	// printf("dJx = \n[%.10f, %.10f, %.10f\n, %.10f, %.10f, %.10f]\n", dJ_dx00, dJ_dx01, dJ_dx02, dJ_dx10, dJ_dx11, dJ_dx12);
-	// printf("dJy = \n[%.10f, %.10f, %.10f\n, %.10f, %.10f, %.10f]\n", dJ_dy00, dJ_dy01, dJ_dy02, dJ_dy10, dJ_dy11, dJ_dy12);
-	// printf("dJz = \n[%.10f, %.10f, %.10f\n, %.10f, %.10f, %.10f]\n", dJ_dz00, dJ_dz01, dJ_dz02, dJ_dz10, dJ_dz11, dJ_dz12);
-
 	float dL_dtx_raw = dJ_dx00 * dL_dJ00 + dJ_dx01 * dL_dJ01 + dJ_dx02 * dL_dJ02 + dJ_dx10 * dL_dJ10 + dJ_dx11 * dL_dJ11 + dJ_dx12 * dL_dJ12;
 	float dL_dty_raw = dJ_dy00 * dL_dJ00 + dJ_dy01 * dL_dJ01 + dJ_dy02 * dL_dJ02 + dJ_dy10 * dL_dJ10 + dJ_dy11 * dL_dJ11 + dJ_dy12 * dL_dJ12;
 	float dL_dtz_raw = dJ_dz00 * dL_dJ00 + dJ_dz01 * dL_dJ01 + dJ_dz02 * dL_dJ02 + dJ_dz10 * dL_dJ10 + dJ_dz11 * dL_dJ11 + dJ_dz12 * dL_dJ12;
@@ -329,20 +324,9 @@ __global__ void computeCov2DFisheyeCUDA(int P,
 	float dL_dtx = x_grad_mul * dL_dtx_raw;
 	float dL_dty = y_grad_mul * dL_dty_raw;
 	float dL_dtz = dL_dtz_raw;
-	// printf("dL_dt = (%.10f, %.10f, %.10f)\n", dL_dtx, dL_dty, dL_dtz);
 
-	// Gradients of loss w.r.t. transformed Gaussian mean t
-	// float dL_dtx = x_grad_mul * -h_x * tz2 * dL_dJ02;
-	// float dL_dty = y_grad_mul * -h_y * tz2 * dL_dJ12;
-	// float dL_dtz = -h_x * tz2 * dL_dJ00 - h_y * tz2 * dL_dJ11 + (2 * h_x * t.x) * tz3 * dL_dJ02 + (2 * h_y * t.y) * tz3 * dL_dJ12;
-
-	// Account for transformation of mean to t
-	// t = transformPoint4x3(mean, view_matrix);
 	float3 dL_dmean = transformVec4x3Transpose({ dL_dtx, dL_dty, dL_dtz }, view_matrix);
 
-	// Gradients of loss w.r.t. Gaussian means, but only the portion 
-	// that is caused because the mean affects the covariance matrix.
-	// Additional mean gradient is accumulated in BACKWARD::preprocess.
 	dL_dmeans[idx] = dL_dmean;
 }
 

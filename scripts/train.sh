@@ -10,5 +10,5 @@ python train.py \
     --ds 1 \
     -r 1 \
     --sh_degree 3 \
-    --fisheye \
+    --camera_model FISHEYE\
     --train_random_background 

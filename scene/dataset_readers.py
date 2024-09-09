@@ -321,15 +321,15 @@ def readNerfSyntheticInfo(args):
     white_background = args.white_background
     eval = args.eval
     extension=".png"
-
+    is_fisheye = (args.camera_model == "FISHEYE")
     print("Reading Training Transforms")
     try:
-        train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension, is_fisheye=args.fisheye)
+        train_cam_infos = readCamerasFromTransforms(path, "transforms_train.json", white_background, extension, is_fisheye)
     except:
-        train_cam_infos = readCamerasFromTransforms(path, "transforms.json", white_background, extension, is_fisheye=args.fisheye)
+        train_cam_infos = readCamerasFromTransforms(path, "transforms.json", white_background, extension, is_fisheye)
     print("Reading Test Transforms")
     try:
-        test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension, is_fisheye=args.fisheye)
+        test_cam_infos = readCamerasFromTransforms(path, "transforms_test.json", white_background, extension, is_fisheye)
     except:
         print('Omit test set.')
         test_cam_infos = []
@@ -448,7 +448,8 @@ def readMvlInfo(args):
                            test_cameras=test_cam_infos,
                            nerf_normalization=nerf_normalization,
                            ply_path=ply_path)
-    return scene_info
+    raise NotImplementedError
+    #return scene_info
 
 sceneLoadTypeCallbacks = {
     "Colmap": readColmapSceneInfo,

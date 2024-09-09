@@ -87,7 +87,7 @@ __device__ float3 computeCov2D(const float3& mean, float focal_x, float focal_y,
 	t.y = min(limy, max(-limy, tytz)) * t.z;
 
 	glm::mat3 J;
-	if (is_fisheye) // panorama
+	if (is_fisheye) // fisheye
 	{
 		float eps = 0.0000001f;
 		float x2 = t.x * t.x + eps;
@@ -104,27 +104,6 @@ __device__ float3 computeCov2D(const float3& mean, float focal_x, float focal_y,
 			focal_y * xy  * (a - b),    focal_y * (y2 * a + x2 * b), - focal_y * t.y * x2y2z2_inv,
 			0, 0, 0
 		);
-		// J = glm::mat3(
-		// 	focal_x * t.z * x2z2_inv * inv_2pi, 0.0f, -focal_x * t.x * x2z2_inv * inv_2pi,
-		// 	0, focal_y* t.z * y2z2_inv * inv_pi, -focal_y * t.y * y2z2_inv * inv_pi,
-		// 	0.0f, 0.0f, 0.0f
-		// );
-		//float eps = 0.001f;
-		// float eps = 0.0000001f;
-		// float x2 = t.x * t.x + eps;
-		// float y2 = t.y * t.y;
-		// float xy = t.x * t.y;
-		// float x2y2 = x2 + y2 ;
-		// float len_xy = length(glm::vec2({t.x, t.y})) + eps;
-		// float x2y2z2_inv = 1.f / (x2y2 + t.z * t.z);
-
-		// float b = glm::atan(len_xy, t.z) / len_xy / x2y2;
-		// float a = t.z * x2y2z2_inv / (x2y2);
-		// J = glm::mat3(
-		// 	focal_x * (x2 * a + y2 * b), focal_x * xy * (a - b),    - focal_x * t.x * x2y2z2_inv,
-		// 	focal_y * xy  * (a - b),    focal_y * (y2 * a + x2 * b), - focal_y * t.y * x2y2z2_inv,
-		// 	0, 0, 0
-		// );
 	}
 	else
 	{
@@ -234,7 +213,7 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	// Perform near culling, quit if outside.
 	float3 p_view;
 	if (!in_frustum(idx, orig_points, viewmatrix, projmatrix, prefiltered, p_view)) 
-		;
+		return;
 
 	// Transform point by projecting
 	float3 p_orig = { orig_points[3 * idx], orig_points[3 * idx + 1], orig_points[3 * idx + 2] };
@@ -242,27 +221,13 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	float3 p_proj;
 	if (is_fisheye) // panorama
 	{
-		float4 p_hom = transformPoint4x4(p_orig, viewmatrix);
-		float p_w = 1.0f / (sqrt(p_hom.x * p_hom.x + p_hom.y * p_hom.y + p_hom.z * p_hom.z) + 0.0000001f);
-		float3 p1 = { p_hom.x * p_w, p_hom.y * p_w, p_hom.z * p_w};
-		const float pi = 3.1415926536f;
-		float xy_len = glm::length(glm::vec2({p1.x, p1.y})) + 0.0000001f;
-		float theta = atan2(xy_len, p1.z);
-		p_proj.x = 2 * p1.x * focal_x * theta / (xy_len * W);
-		p_proj.y = 2 * p1.y * focal_y * theta / (xy_len * H);
+		float xy_len = glm::length(glm::vec2({p_view.x, p_view.y})) + 0.000001f;
+		float theta = glm::atan(xy_len, p_view.z + 0.0000001f);
+		if (abs(theta) > 3.14 * 0.403)
+			return; 
+		p_proj.x = 2 * p_view.x * focal_x * theta / (xy_len * W);
+		p_proj.y = 2 * p_view.y * focal_y * theta / (xy_len * H);
 		p_proj.z = 0;
-		// p_proj.x = - p_view.x * focal_x / p_view.z * 2 / W;
-		// p_proj.y = - p_view.y * focal_y / p_view.z * 2 / H;
-		// p_proj.z = 0;
-		// float xy_len = glm::length(glm::vec2({p_view.x, p_view.y})) + 0.000001f;
-		// float theta = glm::atan(xy_len, p_view.z + 0.0000001f);
-		// if (abs(theta) > 3.14 * 0.403)
-		// 	return; //视锥裁剪
-		// //p_proj.x = - 2 * p_view.x * focal_x * theta / (xy_len * W);
-		// //p_proj.y = - 2 * p_view.y * focal_y * theta / (xy_len * H);
-		// p_proj.x = 2 * p_view.x * focal_x * theta / (xy_len * W);
-		// p_proj.y = 2 * p_view.y * focal_y * theta / (xy_len * H);
-		// p_proj.z = 0;
 	}
 	else
 	{
@@ -305,8 +270,8 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	float2 point_image = { ndc2Pix(p_proj.x, W), ndc2Pix(p_proj.y, H) };
 	uint2 rect_min, rect_max;
 	getRect(point_image, my_radius, rect_min, rect_max, grid);
-	// if ((rect_max.x - rect_min.x) * (rect_max.y - rect_min.y) == 0)
-	// 	return;
+	if ((rect_max.x - rect_min.x) * (rect_max.y - rect_min.y) == 0)
+	 	return;
 
 	// If colors have been precomputed, use them, otherwise convert
 	// spherical harmonics coefficients to RGB color.
@@ -319,7 +284,8 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	}
 
 	// Store some useful helper data for the next steps.
-	depths[idx] = sqrt(p_view.x * p_view.x + p_view.y * p_view.y + p_view.z * p_view.z);
+	// depths[idx] = sqrt(p_view.x * p_view.x + p_view.y * p_view.y + p_view.z * p_view.z);
+	depths[idx] = p_view.z;
 	radii[idx] = my_radius;
 	points_xy_image[idx] = point_image;
 	// Inverse 2D covariance and opacity neatly pack into one float4
