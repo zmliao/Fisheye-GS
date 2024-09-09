@@ -49,7 +49,7 @@ python train.py \
     --colmaps <relative path to colmap file if using dataset> \
     --bs 3 \
     --ds 1 \
-    --fisheye \
+    --camera_model <FISHEYE/PINHOLE> \
     --train_random_background 
 ```
 Or simply use:
@@ -64,7 +64,7 @@ python render.py \
     --images <relative path to images> \
     --colmaps <relative path to colmap file if using dataset> \
     --skip_train \
-    --fisheye \
+    --camera_model <FISHEYE/PINHOLE> \
     --ds 1 \
     -r 1 
 ```
