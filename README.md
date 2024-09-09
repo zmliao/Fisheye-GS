@@ -1,10 +1,14 @@
-# Fisheye-GS: Fisheye-GS: Efficient Gaussian Splatting for Fisheye Cameras
-| Zimu Liao, Siyan Chen, Rong Fu, Yi Wang, Zhongling Su, Hao Luo, Linning Xu, Bo Dai, Hengjie Li, Zhilin Pei, Xingcheng Zhang<br> 
+# Fisheye-GS
 
 ![Teaser image](assets/teaser1.jpg)
 
-**Abstract**: Recently, 3D Gaussian Splatting (3DGS) has gained attention for its high fidelity and real-time rendering. However, adapting 3DGS to different camera models, particularly fisheye lenses, poses challenges due to the unique 3D to 2D projection calculation. Additionally, there are inefficiencies in the tile-based splatting, especially for the extreme curvature and wide field of view of fisheye lenses, which are crucial for its broader real-life applications. To address these challenges, we introduce Fisheye-GS, a novel method that recalculates the projection transformation for fisheye cameras, and then optimizes the rendering process with the reduced number of overlapped tiles. Our method reduces computational redundancy and memory usage, significantly improving rendering speed and enabling 3DGS to be effectively used with a wider range of camera perspectives. With our optimization, we achieved a maximum rendering efficiency of 570 FPS at a high-definition resolution of 1752 × 1168.
-
+Recently, 3D Gaussian Splatting (3DGS) has garnered attention for its high fidelity and real-time rendering. However, adapting 3DGS to different camera models, particularly fisheye lenses, poses challenges due to the unique 3D to 2D projection calculation. Additionally, there are inefficiencies in the tile-based splatting, especially for the extreme curvature and wide field of view of fisheye lenses, 
+which are crucial for its broader real-life applications. To tackle these challenges, we introduce Fisheye-GS. This innovative method recalculates the projection transformation and its gradients for fisheye cameras. Our approach can be seamlessly integrated as a module into other efficient 3D rendering methods, emphasizing its extensibility, lightweight nature, and modular design. Since we only modified the projection component, it can also be easily adapted for use with different camera models. Compared to methods that train after undistortion, our approach demonstrates a clear improvement in visual quality.
+### TODO
+1. Release paper.
+2. Release kernel for panorama lens.
+3. Release Fisheye-GS for [Flash-GS](https://github.com/InternLandMark/FlashGS).
+4. Release the dataset we use.
 ### Hardware Requirements
 
 - CUDA-ready GPU with Compute Capability 7.0+
@@ -12,8 +16,8 @@
 
 ### Software Requirements
 - Conda (recommended for easy setup)
-- C++ Compiler for PyTorch extensions (we used Visual Studio 2019 for Windows)
-- CUDA SDK 11 for PyTorch extensions, install *after* Visual Studio
+- C++ Compiler for PyTorch extensions
+- CUDA SDK 11 for PyTorch extensions
 - C++ Compiler and CUDA SDK must be compatible
 
 ## Setup
