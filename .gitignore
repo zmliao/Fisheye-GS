@@ -15,5 +15,6 @@ tensorboard_3d
 core.*
 *.log
 
-./submodules/panorama_*
 ./submodules/fisheye_gs_rasterizer_old
+./submodules/panorama_gs_rasterizer
+./submodules/panorama_overlap
