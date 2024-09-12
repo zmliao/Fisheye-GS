@@ -5,7 +5,7 @@ python render.py \
     -s /nas/shared/pjlab-lingjun-landmarks/liaozimu/data/scannet/0a5c013435/dslr \
     --images image_undistorted_fisheye \
     --colmaps colmap \
-    --iteration 10000 \
-    --camera_model PINHOLE \
+    --iteration 30000 \
+    --camera_model FISHEYE \
     --ds 1 \
     -r 1  
