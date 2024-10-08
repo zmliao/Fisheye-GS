@@ -53,7 +53,8 @@ class ModelParams(ParamGroup):
         self.colmaps = "sparse/0"
         self._resolution = -1
         self._white_background = False
-        self._camera_model = "FISHEYE"
+        self._camera_model = "FISHEYE" #FISHEYE/PINHOLE
+        self.dataset = "AUTO" #AUTO/COLMAP/BLENDER/SCANNETPP
         self._ds = 10
         self.data_device = "cuda"
         self.eval = False

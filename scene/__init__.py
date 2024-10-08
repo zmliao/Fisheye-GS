@@ -19,6 +19,31 @@ from scene.gaussian_model import GaussianModel
 from arguments import ModelParams
 from utils.camera_utils import cameraList_from_camInfos, camera_to_JSON
 
+def check_colmap(args):
+    return os.path.exists(os.path.join(args.source_path, 'sparse/0'))
+
+def check_blender(args):
+    return os.path.exists(os.path.join(args.source_path, "transforms.json")) or os.path.exists(os.path.join(args.source_path, "transforms_train.json"))
+
+def check_mvl(args):
+    return os.path.exists(os.path.join(args.source_path, "img"))
+
+def check_scannetpp(args):
+    return os.path.exists(os.path.join(args.source_path, 'resized_images'))
+
+def dataset_selector(args):
+    dataset = args.dataset
+    if check_scannetpp(args) and (dataset == "AUTO" or dataset == "SCANNETPP"):
+        return "Scannetpp"
+    if check_colmap(args) and (dataset == "AUTO" or dataset == "COLMAP"):
+        return "Colmap"
+    if check_blender(args) and (dataset == "AUTO" or dataset == "BLENDER"):
+        return "Blender"
+    if check_scannetpp(args) and (dataset == "AUTO" or dataset == "MVL"):
+        return "Mvl"
+    assert False, "Could not recognize scene type!"
+
+
 class Scene:
 
     gaussians : GaussianModel
@@ -40,19 +65,26 @@ class Scene:
 
         self.train_cameras = {}
         self.test_cameras = {}
-        print(args.source_path)
+        dataset = dataset_selector(args)
+        print(Fore.YELLOW + f"Assuming {dataset} data set!" + Style.RESET_ALL)
+        scene_info = sceneLoadTypeCallbacks[dataset](args)
+        # print(args.source_path)
         # if os.path.exists(os.path.join(args.source_path, "sparse")):
-        if os.path.exists(os.path.join(args.source_path, args.colmaps)):
-            scene_info = sceneLoadTypeCallbacks["Colmap"](args)
-            print(Fore.YELLOW+"Assuming Colmap data set!"+Style.RESET_ALL)
-        elif os.path.exists(os.path.join(args.source_path, "transforms.json")) or os.path.exists(os.path.join(args.source_path, "transforms_train.json")):
-            print(Fore.YELLOW+"Found transforms.json file, assuming Blender data set!"+Style.RESET_ALL)
-            scene_info = sceneLoadTypeCallbacks["Blender"](args)
-        elif os.path.exists(os.path.join(args.source_path, "img")):
-            print(Fore.YELLOW+"Assuming MVL data set!"+Style.RESET_ALL)
-            scene_info = sceneLoadTypeCallbacks["MVL"](args)
-        else:
-            assert False, "Could not recognize scene type!"
+        # if os.path.exists(os.path.join(args.source_path, args.colmaps)) and (args.dataset == "AUTO" or args.dataset == "COLMAP"):
+        #     scene_info = sceneLoadTypeCallbacks["Colmap"](args)
+        #     print(Fore.YELLOW+"Assuming Colmap data set!"+Style.RESET_ALL)
+        # elif os.path.exists(os.path.join(args.source_path, "transforms.json")) or os.path.exists(os.path.join(args.source_path, "transforms_train.json"))\
+        #     and (args.dataset == "AUTO" or args.dataset == "BLENDER"):
+        #     print(Fore.YELLOW+"Found transforms.json file, assuming Blender data set!"+Style.RESET_ALL)
+        #     scene_info = sceneLoadTypeCallbacks["Blender"](args)
+        # elif os.path.exists(os.path.join(args.source_path, "img")) and (args.dataset == "AUTO" or args.dataset == "MVL"):
+        #     print(Fore.YELLOW+"Assuming MVL data set!"+Style.RESET_ALL)
+        #     scene_info = sceneLoadTypeCallbacks["MVL"](args)
+        # elif os.path.exists(os.path.join(args.source_path, args.colmaps)) and (args.dataset == "AUTO" or args.dataset == "SCANNETPP"):
+        #     print(Fore.YELLOW+"Assuming SCANNETPP data set!"+Style.RESET_ALL)
+        #     scene_info = sceneLoadTypeCallbacks["Scannetpp"](args)
+        # else:
+        #     assert False, "Could not recognize scene type!"
 
         #print(Fore.GREEN+str(type(self.loaded_iter))+Style.RESET_ALL)
         if not self.loaded_iter:

@@ -80,7 +80,7 @@ def colmap_main(args):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('--path', type=str, default="/nas/shared/pjlab_lingjun_landmarks/liaozimu/data/scannet/0a5c013435/dslr")
+    parser.add_argument('--path', type=str, default="/nas/shared/pjlab-lingjun-landmarks/liaozimu/data/scannet/56a0ec536c/dslr")
     parser.add_argument('--src', type=str, default="resized_images")
     parser.add_argument('--dst', type=str, default="image_undistorted_fisheye")
     args = parser.parse_args()

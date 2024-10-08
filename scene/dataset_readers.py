@@ -78,7 +78,7 @@ def getNerfppNorm(cam_info):
 
     return {"translate": translate, "radius": radius}
 
-def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
+def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder, override_intr=None):
     cam_infos = []
     for idx, key in enumerate(cam_extrinsics):
         sys.stdout.write('\r')
@@ -90,6 +90,10 @@ def readColmapCameras(cam_extrinsics, cam_intrinsics, images_folder):
         intr = cam_intrinsics[extr.camera_id]
         height = intr.height
         width = intr.width
+
+        if override_intr is not None: #SCANNET++
+            intr.params[0] = override_intr[0]
+            intr.params[1] = override_intr[1]
 
         uid = intr.id
         R = np.transpose(qvec2rotmat(extr.qvec))
@@ -160,7 +164,7 @@ def storePly(path, xyz, rgb):
     ply_data.write(path)
 
 # def readColmapSceneInfo(path, images, eval, llffhold=8):
-def readColmapSceneInfo(args):
+def readColmapSceneInfo(args, override_intr=None):
     
     ################
     path = args.source_path
@@ -182,7 +186,7 @@ def readColmapSceneInfo(args):
         cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
     reading_dir = "images" if images == None else images
-    cam_infos_unsorted = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics, images_folder=os.path.join(path, reading_dir))
+    cam_infos_unsorted = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics, images_folder=os.path.join(path, reading_dir), override_intr=override_intr)
     cam_infos = sorted(cam_infos_unsorted.copy(), key = lambda x : x.image_name)
 
     eval = True
@@ -224,14 +228,7 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
 
     with open(os.path.join(path, transformsfile)) as json_file:
         contents = json.load(json_file)
-        # print('------------------------------------')
-        # print("-------path:")
-        # print(path)
-        # print("-------json_file:")
-        # print(json_file)
-        # print("-------contents:")
-        # print(contents)
-        # print('------------------------------------')
+
         try:
             fovx = contents["camera_angle_x"] 
             if is_fisheye:
@@ -260,7 +257,6 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
             # NeRF 'transform_matrix' is a camera-to-world transform
             c2w = np.array(frame["transform_matrix"])
 
-
             if idx % 10 == 0:
                 progress_bar.set_postfix({"num": Fore.YELLOW+f"{ct}/{len(frames)}"+Style.RESET_ALL})
                 progress_bar.update(10)
@@ -269,7 +265,6 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
 
             if not (c2w[:2,3].max() < SCALE and c2w[:2,3].min() > -SCALE):
                 continue
-
 
             ct += 1
 
@@ -451,8 +446,26 @@ def readMvlInfo(args):
     raise NotImplementedError
     #return scene_info
 
+def readScannetppInfo(args):
+    args.colmaps = 'colmap'
+    if args.camera_model == "PINHOLE":
+        args.images = 'undistorted_images'
+    if args.camera_model == "FISHEYE":
+        args.images = 'image_undistorted_fisheye'
+
+    override_intr = None
+    path = args.source_path
+    if args.camera_model == "PINHOLE":
+        with open(os.path.join(os.path.join(path, 'nerfstudio'),'transforms_undistorted.json')) as json_file:
+            contents = json.load(json_file)
+            fl_x = contents["fl_x"]
+            fl_y = contents["fl_y"]
+        override_intr = (fl_x, fl_y)
+    return readColmapSceneInfo(args, override_intr)
+
 sceneLoadTypeCallbacks = {
     "Colmap": readColmapSceneInfo,
     "Blender" : readNerfSyntheticInfo,
-    "MVL" : readMvlInfo 
+    "MVL" : readMvlInfo,
+    "Scannetpp" : readScannetppInfo
 }
