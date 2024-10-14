@@ -45,8 +45,6 @@ sh scripts/prepare.sh
 python train.py \
     -s <path to your dataset> \
     -m <path to model to be trained> \
-    --images <relative path to images> \
-    --colmaps <relative path to colmap file if using dataset> \
     --bs 3 \
     --ds 1 \
     --camera_model <FISHEYE/PINHOLE> \
@@ -61,7 +59,6 @@ sh scripts/train.sh
 python render.py \
     -s <path to your dataset> \
     -m <path to model to be trained> \
-    --images <relative path to images> \
     --colmaps <relative path to colmap file if using dataset> \
     --skip_train \
     --camera_model <FISHEYE/PINHOLE> \
