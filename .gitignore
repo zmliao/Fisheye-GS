@@ -14,7 +14,7 @@ tensorboard_3d
 # build_pc.sh
 core.*
 *.log
-codegen
+# codegen
 
 ./submodules/fisheye_gs_rasterizer_old/
 ./submodules/panorama_gs_rasterizer
